@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import Navbar from "@/components/Navbar";
+import { AuthContextProvider } from "@/contexts/AuthContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,8 +20,11 @@ export default function RootLayout({
   return (
     <html lang="en" className="ligth">
       <body className={cn('min-h-screen font-sans antialiased grainy', inter.className)}>
-        <Navbar />
-        {children}</body>
+        <AuthContextProvider>
+          <Navbar />
+          {children}
+        </AuthContextProvider>
+      </body>
     </html>
   );
 }
