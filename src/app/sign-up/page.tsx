@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation"; // Adicionado useRouter
 import { useSignup } from "@/hooks/useSignup";
 import { ReloadIcon } from "@radix-ui/react-icons";
 
@@ -12,12 +13,12 @@ export default function Page() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const { signup, isPending } = useSignup();
+    const router = useRouter(); // Inicializando o useRouter
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log('enttrou aqui')
-        signup(email, password, fullName);
-        
+        await signup(email, password, fullName);
+        router.push("/dashboard"); // Redirecionando para a página de dashboard após o login
     };
 
     return (
