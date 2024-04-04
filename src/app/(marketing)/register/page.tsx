@@ -1,9 +1,9 @@
-/* import { Metadata } from "next";
+import { Metadata } from "next";
 
 import Link from "next/link";
 import { Command } from "lucide-react";
-import { UserRegisterForm } from "@/components/user-register-auth";
-import AuthButton from "@/components/auth-button";
+import { UserRegisterForm } from "@/components/UserResgisterAuth";
+import AuthButton from "@/components/AuthButton";
 
 export const metadata: Metadata = {
     title: "Autenticação",
@@ -62,4 +62,4 @@ export default async function Register() {
             </div>
         </div>
     );
-} */
+}

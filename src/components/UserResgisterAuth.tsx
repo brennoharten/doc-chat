@@ -5,27 +5,30 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/Icons";
-import { signIn } from "next-auth/react";
 import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
+
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> { }
 
 interface IUser {
+    name: string;
     email: string;
     password: string;
 }
 
-export function UserLoginForm({ className, ...props }: UserAuthFormProps) {
-    const [data, setData] = useState<IUser>({
-        email: "",
-        password: "",
-    });
-
+export function UserRegisterForm({ className, ...props }: UserAuthFormProps) {
     const { toast } = useToast();
 
     const router = useRouter();
+
+    const [data, setData] = useState<IUser>({
+        name: "",
+        email: "",
+        password: "",
+    });
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -33,22 +36,30 @@ export function UserLoginForm({ className, ...props }: UserAuthFormProps) {
         event.preventDefault();
         setIsLoading(true);
 
-        const res = await signIn<"credentials">("credentials", {
-            ...data,
-            redirect: false,
+        const request = await fetch("/api/users", {
+            method: "POST",
+            headers: {
+                "Content-type": "applicaition/json",
+            },
+            body: JSON.stringify(data),
         });
 
-        if (res?.error) {
+        const response = await request.json();
+
+        console.log("USER REGISTER FORM", response);
+
+        if (!request.ok) {
             toast({
-                title: "Ooops...",
-                description: res.error,
+                title: "Oooops...",
+                description: response.error,
                 variant: "destructive",
                 action: (
                     <ToastAction altText="Tente Novamente">Tente Novamente</ToastAction>
                 ),
             });
         } else {
-            router.push("/");
+            console.log(response);
+            router.push("/login");
         }
 
         // setTimeout(() => {
@@ -56,6 +67,7 @@ export function UserLoginForm({ className, ...props }: UserAuthFormProps) {
         // }, 5000);
 
         setData({
+            name: "",
             email: "",
             password: "",
         });
@@ -73,6 +85,22 @@ export function UserLoginForm({ className, ...props }: UserAuthFormProps) {
             {/* {JSON.stringify(data)} */}
             <form onSubmit={onSubmit}>
                 <div className="grid gap-2">
+                    <div className="grid gap-1">
+                        <Label className="sr-only" htmlFor="email">
+                            Name
+                        </Label>
+                        <Input
+                            id="name"
+                            placeholder="nome"
+                            type="text"
+                            autoCapitalize="none"
+                            autoCorrect="off"
+                            disabled={isLoading}
+                            name="name"
+                            value={data.name}
+                            onChange={handleChange}
+                        />
+                    </div>
                     <div className="grid gap-1">
                         <Label className="sr-only" htmlFor="email">
                             Email
@@ -110,7 +138,7 @@ export function UserLoginForm({ className, ...props }: UserAuthFormProps) {
                         {isLoading && (
                             <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
                         )}
-                        Entrar
+                        Registrar
                     </Button>
                 </div>
             </form>
