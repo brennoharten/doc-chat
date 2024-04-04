@@ -1,4 +1,4 @@
-import firebase from "firebase/compat/app";
+/* import firebase from "firebase/compat/app";
 
 interface UserDoc {
 	id: string;
@@ -12,3 +12,4 @@ interface UserDoc {
 }
 
 export default UserDoc;
+ */
