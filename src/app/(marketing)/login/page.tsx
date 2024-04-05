@@ -11,22 +11,22 @@ export const metadata: Metadata = {
         "Autenticação utilizando Shadcs-ui Next-Auth (Authjs), prisma e Nextjs 13.4+",
 };
 
-export default async function Register() {
+export default async function Login() {
     return (
         <div className="container relative py-48 md:py-0  h-[800px] flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
-            <AuthButton page="login" />
+            <AuthButton page="/login" />
             <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
                 <div className="absolute inset-0 bg-zinc-900" />
                 <div className="relative z-20 flex items-center text-lg font-medium">
-                    <Command className="mr-2 h-6 w-6" /> DeveloperDeck101
+                    <Command className="mr-2 h-6 w-6" />
                 </div>
                 <div className="relative z-20 mt-auto">
                     <blockquote className="space-y-2">
-                        <p className="text-lg">
-                            &ldquo;Esta apicação é um guia para utilização do Next-Auth
+                        {/* <p className="text-lg">
+                            &ldquo;Esta aplicação é um guia para utilização do Next-Auth
                             (Authjs) em conjunto com Prisma (MongoDB) e NextJs 13.4+.&rdquo;
                         </p>
-                        <footer className="text-sm">Bruno Kilian</footer>
+                        <footer className="text-sm">Brenno Harten</footer> */}
                     </blockquote>
                 </div>
             </div>

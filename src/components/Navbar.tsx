@@ -2,11 +2,14 @@ import Link from 'next/link'
 import MaxWidthWrapper from './MaxWidthWrapper'
 import { buttonVariants } from './ui/button'
 import { ArrowRight } from 'lucide-react'
-//import UserAccountNav from './UserAccountNav'
+import { getCurrentUser } from "@/lib/session";
 import MobileNav from './MobileNav'
+import SignoutButton from "@/components/SignoutButton";
+import AuthButton from "@/components/AuthButton";
 
-const Navbar = () => {
-  const user = false;
+
+const Navbar = async ({ page }: { page: string | undefined}) => {
+  const user = await getCurrentUser();
 
   return (
     <nav className='sticky h-14 inset-x-0 top-0 z-30 w-full border-b border-gray-200 bg-white/75 backdrop-blur-lg transition-all'>
@@ -40,7 +43,7 @@ const Navbar = () => {
                   Sign in
                 </Link>
                 <Link
-                  href='/sign-up'
+                  href='/register'
                   className={buttonVariants({
                     size: 'sm',
                   })}>
@@ -50,14 +53,7 @@ const Navbar = () => {
               </>
             ) : (
               <>
-                <Link
-                  href='/dashboard'
-                  className={buttonVariants({
-                    variant: 'ghost',
-                    size: 'sm',
-                  })}>
-                  Dashboard
-                </Link>
+                <AuthButton page={page} />
 
                 {/* <UserAccountNav
                   name={

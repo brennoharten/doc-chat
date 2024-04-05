@@ -48,7 +48,7 @@ export function UserLoginForm({ className, ...props }: UserAuthFormProps) {
                 ),
             });
         } else {
-            router.push("/");
+            router.push("/dashboard");
         }
 
         // setTimeout(() => {

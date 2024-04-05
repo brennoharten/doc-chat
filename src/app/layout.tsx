@@ -21,9 +21,10 @@ export default function RootLayout({
   return (
     <html lang="en" className="ligth">
       <body className={cn('min-h-screen font-sans antialiased grainy', inter.className)}>
-        <Navbar />
         <Toaster />
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

@@ -3,10 +3,17 @@ import { buttonVariants } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { getCurrentUser } from "@/lib/session";
+import { redirect } from "next/navigation";
+import Navbar from "@/components/Navbar";
 
-export default function Home() {
+export default async function Home() {
+    const user = await getCurrentUser()
+    if (user && user.email) redirect("/dashboard")
+
     return (
         <>
+            <Navbar page={"/"}/>
             <MaxWidthWrapper className="bm-12 mt-28 sm:mt-40 flex flex-col items-center justify-center text-center">
                 <div className='mx-auto mb-4 flex max-w-fit items-center justify-center space-x-2 overflow-hidden rounded-full border border-accent bg-primary-foreground px-7 py-2 shadow-md backdrop-blur transition-all hover:border-border hover:bg-background'>
                     <p className='text-sm font-semibold text-foreground'>
@@ -29,7 +36,7 @@ export default function Home() {
                         size: 'lg',
                         className: 'mt-5',
                     })}
-                    href='/dashboard'
+                    href='/register'
                     target='_blank'>
                     Get started{' '}
                     <ArrowRight className='ml-2 h-5 w-5' />
