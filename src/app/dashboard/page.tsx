@@ -6,6 +6,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { getCurrentUser } from "@/lib/session";
 import { redirect } from "next/navigation";
 import Navbar from "@/components/Navbar";
+import DashboardComponent from "@/components/DashboardComponent";
 
 export default async function Dashboard() {
     const user = await getCurrentUser();
@@ -14,8 +15,8 @@ export default async function Dashboard() {
 
     return (
         <>
-            <Navbar page={"/"}/>
-            <div>{user?.email}</div>
+            <Navbar page={"/dashboard"} />
+            <DashboardComponent />
         </>
     );
 }
