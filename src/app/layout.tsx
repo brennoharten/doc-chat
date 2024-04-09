@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import Navbar from "@/components/Navbar";
 import { Toaster } from "@/components/ui/toaster";
 import AuthProvider from "@/components/AuthProvider";
+import "react-loading-skeleton/dist/skeleton.css"
 
 const inter = Inter({ subsets: ["latin"] });
 

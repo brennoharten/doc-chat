@@ -36,6 +36,8 @@ export function UserRegisterForm({ className, ...props }: UserAuthFormProps) {
         event.preventDefault();
         setIsLoading(true);
 
+        //Requisicao de Cadastro
+
         const request = await fetch("/api/users", {
             method: "POST",
             headers: {

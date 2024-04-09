@@ -1,8 +1,9 @@
 import { db as prisma } from "@/lib/db"
 import { getCurrentUser } from "@/lib/session"
-import { NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 
-export async function GET(request: NextRequest) {
+export async function GET() {
+    console.log('chegou aqui na api')
     const user = await getCurrentUser()
     const userId = user?.id;
 
@@ -16,6 +17,7 @@ export async function GET(request: NextRequest) {
 
         // Verificar se o usuário possui arquivos
         if (!userFiles || userFiles.length === 0) {
+            console.log('usuario sem arquivos')
             return NextResponse.json({ message: "Usuário não possui arquivos." }, { status: 404 })
         }
 
