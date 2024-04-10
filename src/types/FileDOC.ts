@@ -1,5 +1,5 @@
 // types/File.ts
-export interface File {
+export interface FileDOC {
 	id: string;
 	name: string;
 	createdAt: string;

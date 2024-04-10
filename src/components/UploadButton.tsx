@@ -1,4 +1,4 @@
-/* 'use client'
+'use client'
 
 import { useState } from 'react'
 import {
@@ -13,8 +13,8 @@ import { Cloud, File, Loader2 } from 'lucide-react'
 import { Progress } from './ui/progress'
 import { useUploadThing } from '@/lib/uploadthing'
 import { useToast } from './ui/use-toast'
-import { trpc } from '@/app/_trpc/client'
 import { useRouter } from 'next/navigation'
+import { FileDOC } from '@/types/FileDOC'
 
 const UploadDropzone = ({
     isSubscribed,
@@ -29,19 +29,42 @@ const UploadDropzone = ({
         useState<number>(0)
     const { toast } = useToast()
 
-    const { startUpload } = useUploadThing(
+    /* const { startUpload } = useUploadThing(
         isSubscribed ? 'proPlanUploader' : 'freePlanUploader'
+    ) */
+    const {startUpload} = useUploadThing(
+        "pdfUploader"
     )
 
-    const { mutate: startPolling } = trpc.getFile.useMutation(
-        {
-            onSuccess: (file) => {
-                router.push(`/dashboard/${file.id}`)
-            },
-            retry: true,
-            retryDelay: 500,
+    async function startPolling(fileKey: string) {
+        let retries = 0;
+        const maxRetries = 3;
+        const delay = 500; // 2 segundos de atraso
+    
+        while (retries < maxRetries) {
+            try {
+                const response = await fetch(`/api/files?key=${fileKey}`, { method: 'GET' });
+    
+                if (response.status === 200) {
+                    const file = await response.json() as FileDOC;
+                    router.push(`/dashboard/${file.id}`);
+                    return; // Saia da função se obtiver sucesso
+                } else {
+                    console.error('Erro ao buscar arquivo:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Erro ao buscar arquivo:', error);
+            }
+    
+            retries++;
+    
+            // Aguarde um curto período antes de tentar novamente
+            await new Promise(resolve => setTimeout(resolve, delay));
         }
-    )
+    
+        console.error(`Não foi possível obter o arquivo após ${maxRetries} tentativas.`);
+    }
+    
 
     const startSimulatedProgress = () => {
         setUploadProgress(0)
@@ -93,7 +116,7 @@ const UploadDropzone = ({
                 clearInterval(progressInterval)
                 setUploadProgress(100)
 
-                startPolling({ key })
+                startPolling(key)
             }}>
             {({ getRootProps, getInputProps, acceptedFiles }) => (
                 <div
@@ -130,11 +153,6 @@ const UploadDropzone = ({
                             {isUploading ? (
                                 <div className='w-full mt-4 max-w-xs mx-auto'>
                                     <Progress
-                                        indicatorColor={
-                                            uploadProgress === 100
-                                                ? 'bg-green-500'
-                                                : ''
-                                        }
                                         value={uploadProgress}
                                         className='h-1 w-full bg-zinc-200'
                                     />
@@ -189,4 +207,4 @@ const UploadButton = ({
     )
 }
 
-export default UploadButton */
+export default UploadButton

@@ -11,7 +11,7 @@ import DashboardComponent from "@/components/DashboardComponent";
 export default async function Dashboard() {
     const user = await getCurrentUser();
 
-    if (!user || !user.email) redirect("/register")
+    if (!user || !user.id) redirect("/login")
 
     return (
         <>

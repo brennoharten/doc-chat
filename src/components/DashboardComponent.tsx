@@ -13,14 +13,18 @@ import Skeleton from 'react-loading-skeleton'
 import Link from 'next/link'
 import { format } from 'date-fns'
 import { Button } from './ui/button'
-import {File} from '@/types/File'
+import { FileDOC } from '@/types/FileDOC'
+import ClientComponent from './ClientComponentAuth'
+import UploadButton from './UploadButton'
 
 
 
 
 export default function DashboardComponent() {
-    const [files, setFiles] = useState<File[]>([])
+    const [files, setFiles] = useState<FileDOC[]>([])
     const [isLoading, setIsLoading] = useState(false)
+    const [currentlyDeletingFile, setCurrentlyDeletingFile] =
+        useState<string | null>(null)
 
     useEffect(() => {
         async function fetchData() {
@@ -28,12 +32,29 @@ export default function DashboardComponent() {
             const response = await fetch(`/api/files`)
             const data = await response.json()
             if (response.status == 200) {
-                setFiles(data as File[])
+                setFiles(data as FileDOC[])
             }
             setIsLoading(false)
         }
         fetchData()
     }, [])
+
+    async function deleteFile(fileId: string) {
+        setCurrentlyDeletingFile(fileId);
+        try {
+            const response = await fetch(`/api/files?file=${fileId}`, { method: 'DELETE' })
+            if (response.ok) {
+                // Remove o arquivo do estado files
+                setFiles(prevFiles => prevFiles.filter(file => file.id !== fileId))
+            } else {
+                // Se a requisição não for bem-sucedida, exibe uma mensagem de erro
+                console.error('Erro ao excluir arquivo:', response.statusText)
+            }
+        } catch (error) {
+            console.error('Erro ao excluir arquivo:', error)
+        }
+        setCurrentlyDeletingFile(null);
+    }
 
     return (
         <main className='mx-auto max-w-7xl md:p-10'>
@@ -43,6 +64,7 @@ export default function DashboardComponent() {
                 </h1>
 
                 {/* <UploadButton isSubscribed={subscriptionPlan.isSubscribed} /> */}
+                <UploadButton isSubscribed={false} />
             </div>
 
             {files && files?.length !== 0 ? (
@@ -85,13 +107,13 @@ export default function DashboardComponent() {
                                     </div>
 
                                     <Button
-                                        /* onClick={() =>
-                                            deleteFile({ id: file.id })
-                                        } */
+                                        onClick={() =>
+                                            deleteFile(file.id)
+                                        }
                                         size='sm'
                                         className='w-full'
                                         variant='destructive'>
-                                        {"currentlyDeletingFile" === file.id ? (
+                                        {currentlyDeletingFile === file.id ? (
                                             <Loader2 className='h-4 w-4 animate-spin' />
                                         ) : (
                                             <Trash className='h-4 w-4' />
