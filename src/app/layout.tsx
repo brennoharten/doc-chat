@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import { Toaster } from "@/components/ui/toaster";
 import AuthProvider from "@/components/AuthProvider";
 import "react-loading-skeleton/dist/skeleton.css"
+import Providers from "@/components/Providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,10 +23,12 @@ export default function RootLayout({
   return (
     <html lang="en" className="ligth">
       <body className={cn('min-h-screen font-sans antialiased grainy', inter.className)}>
-        <Toaster />
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <Providers>
+          <Toaster />
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </Providers>
       </body>
     </html>
   );

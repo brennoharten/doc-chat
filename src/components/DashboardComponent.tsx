@@ -16,17 +16,34 @@ import { Button } from './ui/button'
 import { FileDOC } from '@/types/FileDOC'
 import ClientComponent from './ClientComponentAuth'
 import UploadButton from './UploadButton'
+import { trpc } from '@/app/_trpc/client'
 
 
 
 
 export default function DashboardComponent() {
-    const [files, setFiles] = useState<FileDOC[]>([])
-    const [isLoading, setIsLoading] = useState(false)
     const [currentlyDeletingFile, setCurrentlyDeletingFile] =
         useState<string | null>(null)
 
-    useEffect(() => {
+    const utils = trpc.useContext()
+
+    const { data: files, isLoading } =
+        trpc.getUserFiles.useQuery()
+
+    const { mutate: deleteFile } =
+        trpc.deleteFile.useMutation({
+            onSuccess: () => {
+                utils.getUserFiles.invalidate()
+            },
+            onMutate({ id }) {
+                setCurrentlyDeletingFile(id)
+            },
+            onSettled() {
+                setCurrentlyDeletingFile(null)
+            },
+        })
+
+    /* useEffect(() => {
         async function fetchData() {
             setIsLoading(true)
             const response = await fetch(`/api/files`)
@@ -37,9 +54,9 @@ export default function DashboardComponent() {
             setIsLoading(false)
         }
         fetchData()
-    }, [])
+    }, []) */
 
-    async function deleteFile(fileId: string) {
+    /* async function deleteFile(fileId: string) {
         setCurrentlyDeletingFile(fileId);
         try {
             const response = await fetch(`/api/files?file=${fileId}`, { method: 'DELETE' })
@@ -54,7 +71,7 @@ export default function DashboardComponent() {
             console.error('Erro ao excluir arquivo:', error)
         }
         setCurrentlyDeletingFile(null);
-    }
+    } */
 
     return (
         <main className='mx-auto max-w-7xl md:p-10'>
@@ -108,7 +125,7 @@ export default function DashboardComponent() {
 
                                     <Button
                                         onClick={() =>
-                                            deleteFile(file.id)
+                                            deleteFile({ id: file.id })
                                         }
                                         size='sm'
                                         className='w-full'
