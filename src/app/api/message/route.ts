@@ -1,13 +1,13 @@
 import { db } from "@/lib/db";
 import { SendMessageValidator } from "@/lib/validators/SendMessageValidator";
-/* import { openai } from "@/lib/openai";
-import { getPineconeClient } from "@/lib/pinecone";
-import { OpenAIEmbeddings } from "langchain/embeddings/openai";
 import { OpenAIStream, StreamingTextResponse } from "ai";
-import { PineconeStore } from "langchain/vectorstores/pinecone"; */
 import { NextRequest } from "next/server";
 
 import { getCurrentUser } from "@/lib/session";
+import { OpenAIEmbeddings } from "langchain/embeddings/openai";
+import { pinecone } from "@/lib/pinecone";
+import { PineconeStore } from "langchain/vectorstores/pinecone";
+import { openai } from "@/lib/openai";
 
 export const POST = async (req: NextRequest) => {
 	// endpoint for asking a question to a pdf file
@@ -40,12 +40,12 @@ export const POST = async (req: NextRequest) => {
 		},
 	});
 
-	/* // 1: vectorize message
+	 // 1: vectorize message
 	const embeddings = new OpenAIEmbeddings({
 		openAIApiKey: process.env.OPENAI_API_KEY,
 	});
 
-	const pinecone = await getPineconeClient();
+	//const pinecone = await getPineconeClient();
 	const pineconeIndex = pinecone.Index("quill");
 
 	const vectorStore = await PineconeStore.fromExistingIndex(embeddings, {
@@ -115,5 +115,5 @@ export const POST = async (req: NextRequest) => {
 		},
 	});
 
-	return new StreamingTextResponse(stream); */
+	return new StreamingTextResponse(stream); 
 };

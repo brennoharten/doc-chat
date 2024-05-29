@@ -131,7 +131,12 @@ export type OurFileRouter = typeof ourFileRouter;
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
 import { createUploadthing, type FileRouter } from "uploadthing/next";
+import { PDFLoader } from "langchain/document_loaders/fs/pdf";
 import { UploadThingError } from "uploadthing/server";
+import { OpenAIEmbeddings } from "langchain/embeddings/openai";
+import { PineconeStore } from "langchain/vectorstores/pinecone";
+import { pinecone } from "@/lib/pinecone";
+import { WebPDFLoader } from "langchain/document_loaders/web/pdf";
 
 const f = createUploadthing();
 
@@ -149,10 +154,76 @@ export const ourFileRouter = {
 					key: file.key,
 					name: file.name,
 					userId: metadata.userId,
-					url: `https://uploadthing-prod.s3.us-west-2.amazonaws.com/${file.key}`,
-					uploadStatus: "PROCESSING"
-				}
-			})
+					url: file.url,
+					uploadStatus: "PROCESSING",
+				},
+			});
+
+			try {
+				const response = await fetch(file.url);
+
+				const blob = await response.blob();
+
+
+				const loader = new WebPDFLoader(blob);
+
+				const pageLevelDocs = await loader.load();
+
+				const pagesAmt = pageLevelDocs.length;
+
+				/* const { subscriptionPlan } = metadata;
+				const { isSubscribed } = subscriptionPlan;
+
+				const isProExceeded =
+					pagesAmt > PLANS.find((plan) => plan.name === "Pro")!.pagesPerPdf;
+				const isFreeExceeded =
+					pagesAmt > PLANS.find((plan) => plan.name === "Free")!.pagesPerPdf;
+
+				if (
+					(isSubscribed && isProExceeded) ||
+					(!isSubscribed && isFreeExceeded)
+				) {
+					await db.file.update({
+						data: {
+							uploadStatus: "FAILED",
+						},
+						where: {
+							id: createdFile.id,
+						},
+					});
+				} */
+
+				// vectorize and index entire document
+				//const pinecone = await getPineconeClient();
+				const pineconeIndex = pinecone.Index("quill");
+
+				const embeddings = new OpenAIEmbeddings({
+					openAIApiKey: process.env.OPENAI_API_KEY,
+				});
+
+				await PineconeStore.fromDocuments(pageLevelDocs, embeddings, {
+					pineconeIndex,
+					namespace: createdFile.id,
+				});
+
+				await db.file.update({
+					data: {
+						uploadStatus: "SUCCESS",
+					},
+					where: {
+						id: createdFile.id,
+					},
+				});
+			} catch (err) {
+				await db.file.update({
+					data: {
+						uploadStatus: "FAILED",
+					},
+					where: {
+						id: createdFile.id,
+					},
+				});
+			}
 		}),
 } satisfies FileRouter;
 
