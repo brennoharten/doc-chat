@@ -4,9 +4,9 @@ import { OpenAIStream, StreamingTextResponse } from "ai";
 import { NextRequest } from "next/server";
 
 import { getCurrentUser } from "@/lib/session";
-import { OpenAIEmbeddings } from "langchain/embeddings/openai";
+import { OpenAIEmbeddings } from "@langchain/openai";
 import { pinecone } from "@/lib/pinecone";
-import { PineconeStore } from "langchain/vectorstores/pinecone";
+import { PineconeStore } from "@langchain/pinecone";
 import { openai } from "@/lib/openai";
 
 export const POST = async (req: NextRequest) => {

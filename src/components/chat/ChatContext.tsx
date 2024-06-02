@@ -7,7 +7,7 @@ import {
 import { useToast } from '../ui/use-toast'
 import { useMutation } from '@tanstack/react-query'
 import { trpc } from '@/app/_trpc/client'
-//import { INFINITE_QUERY_LIMIT } from '@/config/infinite-query'
+import { INFINITE_QUERY_LIMIT } from '@/config/infinite-query'
 
 type StreamResponse = {
   addMessage: () => void
@@ -63,7 +63,7 @@ export const ChatContextProvider = ({
 
       return response.body
     },
-    /* onMutate: async ({ message }) => {
+    onMutate: async ({ message }) => {
       backupMessage.current = message
       setMessage('')
 
@@ -104,11 +104,11 @@ export const ChatContextProvider = ({
           return {
             ...old,
             pages: newPages,
-          }*/
+          }
         } 
       )
 
-      /* setIsLoading(true)
+      setIsLoading(true)
 
       return {
         previousMessages:
@@ -212,7 +212,7 @@ export const ChatContextProvider = ({
 
       await utils.getFileMessages.invalidate({ fileId })
     },
-  })*/
+  })
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLTextAreaElement>

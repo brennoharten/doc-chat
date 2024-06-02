@@ -1,4 +1,4 @@
-/* import { trpc } from '@/app/_trpc/client'
+import { trpc } from '@/app/_trpc/client'
 import { INFINITE_QUERY_LIMIT } from '@/config/infinite-query'
 import { Loader2, MessageSquare } from 'lucide-react'
 import Skeleton from 'react-loading-skeleton'
@@ -114,4 +114,3 @@ const Messages = ({ fileId }: MessagesProps) => {
 }
 
 export default Messages
- */

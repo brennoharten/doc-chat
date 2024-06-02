@@ -133,8 +133,9 @@ import { getCurrentUser } from "@/lib/session";
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { PDFLoader } from "langchain/document_loaders/fs/pdf";
 import { UploadThingError } from "uploadthing/server";
-import { OpenAIEmbeddings } from "langchain/embeddings/openai";
-import { PineconeStore } from "langchain/vectorstores/pinecone";
+import { OpenAIEmbeddings } from "@langchain/openai";
+import { MemoryVectorStore } from "langchain/vectorstores/memory";
+import { PineconeStore } from "@langchain/pinecone";
 import { pinecone } from "@/lib/pinecone";
 import { WebPDFLoader } from "langchain/document_loaders/web/pdf";
 
@@ -164,8 +165,7 @@ export const ourFileRouter = {
 
 				const blob = await response.blob();
 
-
-				const loader = new WebPDFLoader(blob);
+				const loader = new PDFLoader(blob);
 
 				const pageLevelDocs = await loader.load();
 
@@ -215,6 +215,7 @@ export const ourFileRouter = {
 					},
 				});
 			} catch (err) {
+				console.log(err)
 				await db.file.update({
 					data: {
 						uploadStatus: "FAILED",

@@ -1,13 +1,9 @@
-
-import {
-  privateProcedure,
-  publicProcedure,
-  router,
-} from './trpc'
-import { TRPCError } from '@trpc/server'
-import { db } from '@/lib/db'
-import { z } from 'zod'
-import { getCurrentUser } from '@/lib/session'
+import { privateProcedure, publicProcedure, router } from "./trpc";
+import { TRPCError } from "@trpc/server";
+import { db } from "@/lib/db";
+import { z } from "zod";
+import { getCurrentUser } from "@/lib/session";
+import { INFINITE_QUERY_LIMIT } from "@/config/infinite-query";
 /* import { INFINITE_QUERY_LIMIT } from '@/config/infinite-query' */
 /* import { absoluteUrl } from '@/lib/utils' */
 /* import {
@@ -17,42 +13,42 @@ import { getCurrentUser } from '@/lib/session'
 import { PLANS } from '@/config/stripe' */
 
 export const appRouter = router({
-  authCallback: publicProcedure.query(async () => {
-    const user = await getCurrentUser()
+	authCallback: publicProcedure.query(async () => {
+		const user = await getCurrentUser();
 
-    if (!user || !user.id || !user.email)
-      throw new TRPCError({ code: 'UNAUTHORIZED' })
+		if (!user || !user.id || !user.email)
+			throw new TRPCError({ code: "UNAUTHORIZED" });
 
-    // check if the user is in the database
-    const dbUser = await db.user.findFirst({
-      where: {
-        id: user.id,
-      },
-    })
+		// check if the user is in the database
+		const dbUser = await db.user.findFirst({
+			where: {
+				id: user.id,
+			},
+		});
 
-    if (!dbUser) {
-      // create user in db
-      await db.user.create({
-        data: {
-          id: user.id,
-          email: user.email,
-        },
-      })
-    }
+		if (!dbUser) {
+			// create user in db
+			await db.user.create({
+				data: {
+					id: user.id,
+					email: user.email,
+				},
+			});
+		}
 
-    return { success: true }
-  }),
-  getUserFiles: privateProcedure.query(async ({ ctx }) => {
-    const { userId } = ctx
+		return { success: true };
+	}),
+	getUserFiles: privateProcedure.query(async ({ ctx }) => {
+		const { userId } = ctx;
 
-    return await db.file.findMany({
-      where: {
-        userId,
-      },
-    })
-  }),
+		return await db.file.findMany({
+			where: {
+				userId,
+			},
+		});
+	}),
 
-  /* createStripeSession: privateProcedure.mutation(
+	/* createStripeSession: privateProcedure.mutation(
     async ({ ctx }) => {
       const { userId } = ctx
 
@@ -110,62 +106,111 @@ export const appRouter = router({
     }
   ), */
 
-  /* quillorigin */
+	getFileMessages: privateProcedure
+		.input(
+			z.object({
+				limit: z.number().min(1).max(100).nullish(),
+				cursor: z.string().nullish(),
+				fileId: z.string(),
+			})
+		)
+		.query(async ({ ctx, input }) => {
+			const { userId } = ctx;
+			const { fileId, cursor } = input;
+			const limit = input.limit ?? INFINITE_QUERY_LIMIT;
 
-  getFileUploadStatus: privateProcedure
-    .input(z.object({ fileId: z.string() }))
-    .query(async ({ input, ctx }) => {
-      const file = await db.file.findFirst({
-        where: {
-          id: input.fileId,
-          userId: ctx.userId,
-        },
-      })
+			const file = await db.file.findFirst({
+				where: {
+					id: fileId,
+					userId,
+				},
+			});
 
-      if (!file) return { status: 'PENDING' as const }
+			if (!file) throw new TRPCError({ code: "NOT_FOUND" });
 
-      return { status: file.uploadStatus }
-    }),
+			const messages = await db.message.findMany({
+				take: limit + 1,
+				where: {
+					fileId,
+				},
+				orderBy: {
+					createdAt: "desc",
+				},
+				cursor: cursor ? { id: cursor } : undefined,
+				select: {
+					id: true,
+					isUserMessage: true,
+					createdAt: true,
+					text: true,
+				},
+			});
 
-  getFile: privateProcedure
-    .input(z.object({ key: z.string() }))
-    .mutation(async ({ ctx, input }) => {
-      const { userId } = ctx
+			let nextCursor: typeof cursor | undefined = undefined;
+			if (messages.length > limit) {
+				const nextItem = messages.pop();
+				nextCursor = nextItem?.id;
+			}
 
-      const file = await db.file.findFirst({
-        where: {
-          key: input.key,
-          userId,
-        },
-      })
+			return {
+				messages,
+				nextCursor,
+			};
+		}),
 
-      if (!file) throw new TRPCError({ code: 'NOT_FOUND' })
+	getFileUploadStatus: privateProcedure
+		.input(z.object({ fileId: z.string() }))
+		.query(async ({ input, ctx }) => {
+			const file = await db.file.findFirst({
+				where: {
+					id: input.fileId,
+					userId: ctx.userId,
+				},
+			});
 
-      return file
-    }),
+			if (!file) return { status: "PENDING" as const };
 
-  deleteFile: privateProcedure
-    .input(z.object({ id: z.string() }))
-    .mutation(async ({ ctx, input }) => {
-      const { userId } = ctx
+			return { status: file.uploadStatus };
+		}),
 
-      const file = await db.file.findFirst({
-        where: {
-          id: input.id,
-          userId,
-        },
-      })
+	getFile: privateProcedure
+		.input(z.object({ key: z.string() }))
+		.mutation(async ({ ctx, input }) => {
+			const { userId } = ctx;
 
-      if (!file) throw new TRPCError({ code: 'NOT_FOUND' })
+			const file = await db.file.findFirst({
+				where: {
+					key: input.key,
+					userId,
+				},
+			});
 
-      await db.file.delete({
-        where: {
-          id: input.id,
-        },
-      })
+			if (!file) throw new TRPCError({ code: "NOT_FOUND" });
 
-      return file
-    }),
-})
+			return file;
+		}),
 
-export type AppRouter = typeof appRouter
+	deleteFile: privateProcedure
+		.input(z.object({ id: z.string() }))
+		.mutation(async ({ ctx, input }) => {
+			const { userId } = ctx;
+
+			const file = await db.file.findFirst({
+				where: {
+					id: input.id,
+					userId,
+				},
+			});
+
+			if (!file) throw new TRPCError({ code: "NOT_FOUND" });
+
+			await db.file.delete({
+				where: {
+					id: input.id,
+				},
+			});
+
+			return file;
+		}),
+});
+
+export type AppRouter = typeof appRouter;
