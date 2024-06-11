@@ -1,4 +1,5 @@
 import MaxWidthWrapper from '@/components/MaxWidthWrapper'
+import UpgradeButton from '@/components/UpgradeButton'
 import UploadButton from '@/components/UploadButton'
 //import UpgradeButton from '@/components/UpgradeButton'
 import { buttonVariants } from '@/components/ui/button'
@@ -224,7 +225,7 @@ const Page = async () => {
                           <ArrowRight className='h-5 w-5 ml-1.5' />
                         </Link>
                       ) : user ? (
-                        <Upload/>
+                        <UpgradeButton/>
                       ) : (
                         <Link
                           href='/sign-in'
