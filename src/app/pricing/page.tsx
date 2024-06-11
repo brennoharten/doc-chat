@@ -1,4 +1,5 @@
 import MaxWidthWrapper from '@/components/MaxWidthWrapper'
+import Navbar from '@/components/Navbar'
 import UpgradeButton from '@/components/UpgradeButton'
 import UploadButton from '@/components/UploadButton'
 //import UpgradeButton from '@/components/UpgradeButton'
@@ -87,6 +88,7 @@ const Page = async () => {
 
   return (
     <>
+      <Navbar page={"/dashboard"} />
       <MaxWidthWrapper className='mb-8 mt-24 text-center max-w-5xl'>
         <div className='mx-auto mb-10 sm:max-w-lg'>
           <h1 className='text-6xl font-bold sm:text-7xl'>

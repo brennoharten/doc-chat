@@ -6,6 +6,7 @@ import { getCurrentUser } from "@/lib/session";
 import MobileNav from './MobileNav'
 import SignoutButton from "@/components/SignoutButton";
 import AuthButton from "@/components/AuthButton";
+import UserAccountNav from './UserAccountNav';
 
 
 const Navbar = async ({ page }: { page: string | undefined}) => {
@@ -54,16 +55,23 @@ const Navbar = async ({ page }: { page: string | undefined}) => {
             ) : (
               <>
                 <AuthButton page={page} />
-
-                {/* <UserAccountNav
+                <Link
+                  href='/dashboard'
+                  className={buttonVariants({
+                    variant: 'ghost',
+                    size: 'sm',
+                  })}>
+                  Dashboard
+                </Link>
+                <UserAccountNav
                   name={
-                    !user.given_name || !user.family_name
+                    !user.nome
                       ? 'Your Account'
-                      : `${user.given_name} ${user.family_name}`
+                      : user.nome
                   }
                   email={user.email ?? ''}
-                  imageUrl={user.picture ?? ''}
-                /> */}
+                  imageUrl={user.image ?? ''}
+                />
               </>
             )}
           </div>
