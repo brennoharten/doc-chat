@@ -31,7 +31,8 @@ export async function POST(request: NextRequest){
         data: {
             email,
             name,
-            hashedPassword
+            hashedPassword,
+            stripeCustomerId: null,
         }
     })
 
