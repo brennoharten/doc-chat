@@ -29,17 +29,14 @@ const UploadDropzone = ({
         useState<number>(0)
     const { toast } = useToast()
 
-    /* const { startUpload } = useUploadThing(
+    const { startUpload } = useUploadThing(
         isSubscribed ? 'proPlanUploader' : 'freePlanUploader'
-    ) */
-    const {startUpload} = useUploadThing(
-        "pdfUploader"
     )
 
     async function startPolling(fileKey: string) {
         let retries = 0;
         const maxRetries = 3;
-        const delay = 500; // 2 segundos de atraso
+        const delay = 500;
     
         while (retries < maxRetries) {
             try {

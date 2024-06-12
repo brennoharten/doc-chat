@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-//import UploadButton from './UploadButton'
 import {
     Ghost,
     Loader2,
@@ -17,11 +16,14 @@ import { FileDOC } from '@/types/FileDOC'
 import ClientComponent from './ClientComponentAuth'
 import UploadButton from './UploadButton'
 import { trpc } from '@/app/_trpc/client'
+import { getUserSubscriptionPlan } from '@/lib/stripe'
 
 
+interface PageProps {
+    subscriptionPlan: Awaited<ReturnType<typeof getUserSubscriptionPlan>>
+}
 
-
-export default function DashboardComponent() {
+export default function DashboardComponent({ subscriptionPlan }: PageProps) {
     const [currentlyDeletingFile, setCurrentlyDeletingFile] =
         useState<string | null>(null)
 
@@ -80,8 +82,7 @@ export default function DashboardComponent() {
                     My Files
                 </h1>
 
-                {/* <UploadButton isSubscribed={subscriptionPlan.isSubscribed} /> */}
-                <UploadButton isSubscribed={false} />
+                <UploadButton isSubscribed={subscriptionPlan.isSubscribed} />
             </div>
 
             {files && files?.length !== 0 ? (
